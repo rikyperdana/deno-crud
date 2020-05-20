@@ -13,7 +13,7 @@ makeModal = name => m('.modal',
 )
 
 m.mount(document.body, {view: () => m('.container', m('.content',
-  m('h1', 'Hello Deno'),
+  m('h1', 'Deno CRUD'),
   m('.buttons',
     m('.button.is-primary', {
       onclick: () => state.modalGetCollection = m('.box',
