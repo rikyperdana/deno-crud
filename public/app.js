@@ -62,7 +62,7 @@ m.mount(document.body, {view: () => m('.container', m('.content',
   makeModal('modalGetCollection'),
   makeModal('modalItem'),
   makeModal('modalAdd'),
-  m('table.table',
+  m('table.table.is-striped',
     m('thead', m('tr', m('th', '_id'), m('th', 'Preview'))),
     m('tbody', (state.collData || []).map(i => m('tr',
       {
@@ -92,7 +92,8 @@ m.mount(document.body, {view: () => m('.container', m('.content',
           }, 'Delete')
         )
       },
-      m('td', i._id), m('td', JSON.stringify(i).substring(0, 100)+' ...')
+      m('td', i._id),
+      m('td', JSON.stringify(i).substring(0, 110)+' ...')
     )))
   )
 ))})
