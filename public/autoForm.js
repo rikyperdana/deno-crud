@@ -118,6 +118,7 @@ function autoForm(opts){return {view: function(){
         required: !schema.optional,
         value: _.get(afState.form, [opts.id, name]),
         placeholder: _.get(schema, 'autoform.placeholder'),
+        rows: _.get(schema, 'autoform.rows') || 6,
       })
     )},
     select: function(){return m('.field.is-expanded',

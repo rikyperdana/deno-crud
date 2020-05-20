@@ -25,7 +25,7 @@ m.mount(document.body, {view: () => m('.container', m('.content',
           },
           doc: state.target,
           action: doc => [
-            poster('dbCall', doc, res => [
+            poster('dbGet', doc, res => [
               state.target = doc,
               state.collData = res.data,
               m.redraw()
@@ -36,7 +36,10 @@ m.mount(document.body, {view: () => m('.container', m('.content',
       )
     }, 'Get Collection'),
     state.collData && m('.button.is-success', {
-      onclick: () => console.log(state.target)
+      onclick: () => poster('dbGet', state.target, res => [
+        state.collData = res.data,
+        m.redraw()
+      ]),
     }, 'Refresh')
   ),
   makeModal('modalGetCollection'),
@@ -45,14 +48,18 @@ m.mount(document.body, {view: () => m('.container', m('.content',
     m('thead', m('tr', m('th', '_id'), m('th', 'Preview'))),
     m('tbody', (state.collData || []).map(i => m('tr',
       {
-        onclick: () => console.log(i),
         ondblclick: () => state.modalItem = m('.box',
           m(autoForm({
             id: 'updateItem',
-            schema:{content: {type: String, autoform: {type: 'textarea'}}},
-            doc: {content: JSON.stringify(i)},
+            schema:{ content: {
+              type: String, autoform: {type: 'textarea', rows: 18}
+            }},
+            doc: {content: JSON.stringify(i, null, 4)},
             action: doc => [
-              console.log(JSON.parse(doc.content)),
+              poster('/dbUpdate', {
+                ...state.target,
+                doc: JSON.parse(doc.content)
+              }, console.log),
               state.modalItem = null, m.redraw()
             ],
             submit: {value: 'Update', class: 'is-warning'}

@@ -13,12 +13,19 @@ const responder = obj => ({
 
 app = createApp()
 app.use(serveStatic('./public'))
-app.post('/dbCall', async req => {
+app.post('/dbGet', async req => {
   var text = await req.text(), obj = JSON.parse(text),
   db = client.database(obj.dbName),
   coll = db.collection(obj.collName),
   list = await coll.find({})
   req.respond(responder({data: list}))
+})
+app.post('/dbUpdate', async req => {
+  var text = await req.text(), obj = JSON.parse(text),
+  db = client.database(obj.dbName),
+  coll = db.collection(obj.collName)
+  await coll.updateOne({_id: obj.doc._id}, obj.doc)
+  req.respond(responder({status: true}))
 })
 
 app.listen({port: 3000})
