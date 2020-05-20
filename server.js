@@ -5,8 +5,6 @@ import 'https://deno.land/x/dotenv/load.ts'
 await init()
 var client = new MongoClient()
 client.connectWithUri(Deno.env.get('MONGO'))
-// people = db.collection('users')
-// people.find({}).then(res => console.log(res))
 
 const responder = obj => ({
   headers: new Headers({"content-type": "text/plain"}),
