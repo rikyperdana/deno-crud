@@ -3,12 +3,16 @@ This is a CRUD (Create, Read, Update, Delete) built on top of DenoJS.
 
 ## Preparation
 `git clone https://github.com/rikyperdana/deno-crud`
+
 Create a file named `.env` inside the folder that contain this line:
+
 `MONGO="your mongo connection string"`
+
 Ex: I got my connection string from Atlas connect menu
 
 ## Start
 `deno run -A --unstable server.js`
+
 Get to http://localhost:3000
 
 ## How to Use
