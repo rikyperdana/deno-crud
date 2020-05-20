@@ -59,12 +59,26 @@ m.mount(document.body, {view: () => m('.container', m('.content',
       )
     }, 'Add')
   ),
+  state.collData && m('.control.is-expanded',
+    m('input.input.is-fullwidth', {
+      type: 'text', placeholder: 'Search by query, Ex: {"_id": "abc123"}',
+      onkeypress: e => [
+        e.redraw = false,
+        e.key === 'Enter' && [
+          state.searchResults = state.collData.filter(
+            sift.default(JSON.parse(e.target.value))
+          )
+        ],
+        m.redraw()
+      ]
+    })
+  ),
   makeModal('modalGetCollection'),
   makeModal('modalItem'),
   makeModal('modalAdd'),
-  m('table.table.is-striped',
-    m('thead', m('tr', m('th', '_id'), m('th', 'Preview'))),
-    m('tbody', (state.collData || []).map(i => m('tr',
+  state.collData && m('table.table.is-striped',
+    m('thead', m('tr', m('th', '#'), m('th', 'Document'))),
+    m('tbody', (state.searchResults || state.collData || []).map((i, j) => m('tr',
       {
         ondblclick: () => state.modalItem = m('.box',
           m(autoForm({
@@ -92,8 +106,8 @@ m.mount(document.body, {view: () => m('.container', m('.content',
           }, 'Delete')
         )
       },
-      m('td', i._id),
-      m('td', JSON.stringify(i).substring(0, 110)+' ...')
+      m('td', j+1),
+      m('td', JSON.stringify(i).substring(0, 150)+' ...')
     )))
   )
 ))})
