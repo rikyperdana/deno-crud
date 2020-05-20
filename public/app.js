@@ -40,10 +40,28 @@ m.mount(document.body, {view: () => m('.container', m('.content',
         state.collData = res.data,
         m.redraw()
       ]),
-    }, 'Refresh')
+    }, 'Refresh'),
+    state.collData && m('.button.is-info', {
+      onclick: () => state.modalAdd = m('.box',
+        m(autoForm({
+          id: 'addItem',
+          schema: {content: {
+            type: String, autoform: {type: 'textarea', rows: 18}
+          }},
+          action: doc => [
+            poster('/dbAdd', {
+              ...state.target,
+              doc: JSON.parse(doc.content)
+            }, console.log),
+            state.modalAdd = null, m.redraw()
+          ]
+        }))
+      )
+    }, 'Add')
   ),
   makeModal('modalGetCollection'),
   makeModal('modalItem'),
+  makeModal('modalAdd'),
   m('table.table',
     m('thead', m('tr', m('th', '_id'), m('th', 'Preview'))),
     m('tbody', (state.collData || []).map(i => m('tr',
@@ -63,7 +81,15 @@ m.mount(document.body, {view: () => m('.container', m('.content',
               state.modalItem = null, m.redraw()
             ],
             submit: {value: 'Update', class: 'is-warning'}
-          }))
+          })),
+          m('.button.is-danger', {
+            ondblclick: () => [
+              poster('/dbDelete', {
+                ...state.target, _id: i._id
+              }, console.log),
+              state.modalItem = null, m.redraw()
+            ]
+          }, 'Delete')
         )
       },
       m('td', i._id), m('td', JSON.stringify(i).substring(0, 100)+' ...')

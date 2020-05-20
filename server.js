@@ -13,6 +13,13 @@ const responder = obj => ({
 
 app = createApp()
 app.use(serveStatic('./public'))
+app.post('/dbAdd', async req => {
+  var text = await req.text(), obj = JSON.parse(text),
+  db = client.database(obj.dbName),
+  coll = db.collection(obj.collName)
+  await coll.insertOne(obj.doc)
+  req.respond(responder({status: true}))
+})
 app.post('/dbGet', async req => {
   var text = await req.text(), obj = JSON.parse(text),
   db = client.database(obj.dbName),
@@ -25,6 +32,13 @@ app.post('/dbUpdate', async req => {
   db = client.database(obj.dbName),
   coll = db.collection(obj.collName)
   await coll.updateOne({_id: obj.doc._id}, obj.doc)
+  req.respond(responder({status: true}))
+})
+app.post('/dbDelete', async req => {
+  var text = await req.text(), obj = JSON.parse(text),
+  db = client.database(obj.dbName),
+  coll = db.collection(obj.collName)
+  await coll.deleteOne({_id: obj._id})
   req.respond(responder({status: true}))
 })
 
