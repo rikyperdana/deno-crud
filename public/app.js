@@ -3,6 +3,11 @@ poster = (url, obj, cb) => $.post(
   url, JSON.stringify(obj), res => cb(JSON.parse(res))
 ),
 
+randomId = () =>
+  [1, 1].map(() =>
+    Math.random().toString(36).slice(2)
+  ).join(''),
+
 makeModal = name => m('.modal',
   {class: state[name] && 'is-active'},
   m('.modal-background'),
@@ -25,18 +30,23 @@ m.mount(document.body, {view: () => m('.container', m('.content',
           },
           doc: state.target,
           action: doc => [
-            poster('dbGet', doc, res => [
+            state.loading = true, m.redraw(),
+            poster('dbCall', {
+              method: 'get', ...doc
+            }, res => [
               state.target = doc,
               state.collData = res.data,
+              state.modalGetCollection = null,
               m.redraw()
-            ]),
-            state.modalGetCollection = null
+            ])
           ]
         }))
       )
     }, 'Get Collection'),
     state.collData && m('.button.is-success', {
-      onclick: () => poster('dbGet', state.target, res => [
+      onclick: () => poster('dbCall', {
+        method: 'get', ...state.target
+      }, res => [
         state.collData = res.data,
         m.redraw()
       ]),
@@ -49,9 +59,9 @@ m.mount(document.body, {view: () => m('.container', m('.content',
             type: String, autoform: {type: 'textarea', rows: 18}
           }},
           action: doc => [
-            poster('/dbAdd', {
-              ...state.target,
-              doc: JSON.parse(doc.content)
+            poster('dbCall', {
+              method: 'add', ...state.target,
+              doc: _.merge(JSON.parse(doc.content), {_id: randomId()})
             }, console.log),
             state.modalAdd = null, m.redraw()
           ]
@@ -88,8 +98,8 @@ m.mount(document.body, {view: () => m('.container', m('.content',
             }},
             doc: {content: JSON.stringify(i, null, 4)},
             action: doc => [
-              poster('/dbUpdate', {
-                ...state.target,
+              poster('dbCall', {
+                method: 'update', ...state.target,
                 doc: JSON.parse(doc.content)
               }, console.log),
               state.modalItem = null, m.redraw()
@@ -98,8 +108,9 @@ m.mount(document.body, {view: () => m('.container', m('.content',
           })),
           m('.button.is-danger', {
             ondblclick: () => [
-              poster('/dbDelete', {
-                ...state.target, _id: i._id
+              poster('dbCall', {
+                method: 'remove', _id: i._id,
+                ...state.target
               }, console.log),
               state.modalItem = null, m.redraw()
             ]
