@@ -29,7 +29,7 @@ m.mount(document.body, {view: () => m('.container', m('.content',
             collName: {type: String, label: 'Collection Name'},
             project: {
               type: String, optional: true, label: 'Projection',
-              placeholder: 'Ex: {"age": {"$gte": 20, "$lte": 35}}'
+              autoform: {placeholder: 'Ex: {"age": {"$gte": 20, "$lte": 35}}'}
             }
           },
           doc: state.target,
