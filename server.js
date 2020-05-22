@@ -1,4 +1,4 @@
-import {createApp, serveStatic, contentTypeFilter} from 'https://servestjs.org/@v1.0.0/mod.ts'
+import {createApp, serveStatic} from 'https://servestjs.org/@v1.0.0/mod.ts'
 import {init, MongoClient} from 'https://deno.land/x/mongo@v0.6.0/mod.ts'
 import 'https://deno.land/x/dotenv/load.ts'
 
@@ -19,7 +19,7 @@ app.post('/dbCall', async req => {
   db = client.database(obj.dbName),
   coll = db.collection(obj.collName),
   data = await ({
-    get: async () => await coll.find(JSON.parse(obj.project || '{}') || {}),
+    get: async () => await coll.find(JSON.parse(obj.project || '{}')),
     add: async () => await coll.insertOne(obj.doc),
     update: async () => await coll.updateOne({_id: obj.doc._id}, obj.doc),
     remove: async () => await coll.deleteOne({_id: obj._id})
