@@ -26,11 +26,14 @@ m.mount(document.body, {view: () => m('.container', m('.content',
           id: 'getCollection',
           schema: {
             dbName: {type: String, label: 'Database Name'},
-            collName: {type: String, label: 'Collection Name'}
+            collName: {type: String, label: 'Collection Name'},
+            project: {
+              type: String, optional: true, label: 'Projection',
+              placeholder: 'Ex: {"age": {"$gte": 20, "$lte": 35}}'
+            }
           },
           doc: state.target,
           action: doc => [
-            state.loading = true, m.redraw(),
             poster('dbCall', {
               method: 'get', ...doc
             }, res => [
