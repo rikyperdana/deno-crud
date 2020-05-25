@@ -75,6 +75,13 @@ m.mount(document.body, {view: () => m('.container', m('.content',
           }))
         )
       }, 'Add'),
+      m('.button.is-link', {
+        onclick: () => saveAs((
+          new Blob([
+            [state.collData.map(i => JSON.stringify(i)+';').join('\n')]
+          ], {type: 'text/csv;charset=utf-8;'})
+        ), state.target.dbName+'-'+state.target.collName+'-'+Date()+'.csv')
+      }, 'Export'),
       m('.button.is-warning', m('.file.is-warning', m('label.file-label',
         m('input.file-input', {type: 'file', name: 'import', onchange: e =>
           Papa.parse(e.target.files[0], {
@@ -87,13 +94,6 @@ m.mount(document.body, {view: () => m('.container', m('.content',
         }),
         m('span.file-cta', m('span.file-label', 'Import'))
       ))),
-      m('.button.is-info', {
-        onclick: () => saveAs((
-          new Blob([
-            [state.collData.map(i => JSON.stringify(i)+';').join('\n')]
-          ], {type: 'text/csv;charset=utf-8;'})
-        ), state.target.dbName+'-'+state.target.collName+'-'+Date()+'.csv')
-      }, 'Export'),
       m('.button.is-danger', {
         ondblclick: () => confirm('Are you sure to drop this collection?')
         && poster('dbCall', {
