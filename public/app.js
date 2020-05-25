@@ -46,31 +46,61 @@ m.mount(document.body, {view: () => m('.container', m('.content',
         }))
       )
     }, 'Get Collection'),
-    state.collData && m('.button.is-success', {
-      onclick: () => poster('dbCall', {
-        method: 'get', ...state.target
-      }, res => [
-        state.collData = res.data,
-        m.redraw()
-      ]),
-    }, 'Refresh'),
-    state.collData && m('.button.is-info', {
-      onclick: () => state.modalAdd = m('.box',
-        m(autoForm({
-          id: 'addItem',
-          schema: {content: {
-            type: String, autoform: {type: 'textarea', rows: 18}
-          }},
-          action: doc => [
-            poster('dbCall', {
-              method: 'add', ...state.target,
-              doc: _.merge(JSON.parse(doc.content), {_id: randomId()})
-            }, console.log),
-            state.modalAdd = null, m.redraw()
-          ]
-        }))
-      )
-    }, 'Add')
+    state.collData && [
+      m('.button.is-success', {
+        onclick: () => [
+          state.collData = [],
+          poster('dbCall', {
+            method: 'get', ...state.target
+          }, res => [
+            state.collData = res.data,
+            m.redraw()
+          ]),
+        ]
+      }, 'Refresh'),
+      m('.button.is-info', {
+        onclick: () => state.modalAdd = m('.box',
+          m(autoForm({
+            id: 'addItem',
+            schema: {content: {
+              type: String, autoform: {type: 'textarea', rows: 18}
+            }},
+            action: doc => [
+              poster('dbCall', {
+                method: 'add', ...state.target,
+                doc: _.merge(JSON.parse(doc.content), {_id: randomId()})
+              }, console.log),
+              state.modalAdd = null, m.redraw()
+            ]
+          }))
+        )
+      }, 'Add'),
+      m('.button.is-warning', m('.file.is-warning', m('label.file-label',
+        m('input.file-input', {type: 'file', name: 'import', onchange: e =>
+          Papa.parse(e.target.files[0], {
+            delimiter: ';', newline: ';',
+            complete: result => poster('dbCall', {
+              ...state.target, method: 'insertMany',
+              documents: result.data.map(i => JSON.parse(i[0]))
+            }, console.log)
+          })
+        }),
+        m('span.file-cta', m('span.file-label', 'Import'))
+      ))),
+      m('.button.is-info', {
+        onclick: () => saveAs((
+          new Blob([
+            [state.collData.map(i => JSON.stringify(i)+';').join('\n')]
+          ], {type: 'text/csv;charset=utf-8;'})
+        ), state.target.dbName+'-'+state.target.collName+'-'+Date()+'.csv')
+      }, 'Export'),
+      m('.button.is-danger', {
+        ondblclick: () => confirm('Are you sure to drop this collection?')
+        && poster('dbCall', {
+          ...state.target, method: 'deleteMany'
+        }, console.log)
+      }, 'Drop')
+    ]
   ),
   state.collData && m('.control.is-expanded',
     m('input.input.is-fullwidth', {

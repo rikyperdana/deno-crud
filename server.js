@@ -22,7 +22,9 @@ app.post('/dbCall', async req => {
     get: async () => await coll.find(JSON.parse(obj.project || '{}')),
     add: async () => await coll.insertOne(obj.doc),
     update: async () => await coll.updateOne({_id: obj.doc._id}, obj.doc),
-    remove: async () => await coll.deleteOne({_id: obj._id})
+    remove: async () => await coll.deleteOne({_id: obj._id}),
+    insertMany: async () => await coll.insertMany(obj.documents),
+    deleteMany: async () => await coll.deleteMany({})
   })[obj.method]()
   req.respond(responder({data}))
 })
