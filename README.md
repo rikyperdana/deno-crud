@@ -25,7 +25,7 @@ Get to http://localhost:3000
 
 You can also use the REST API programmatically through browser console, like:
 ```
-poster('dbCal', {
+poster('dbCall', {
   method: 'get', dbName: 'yourDb', collName: 'yourCollection'
 }, res => console.log(res))
 ```
