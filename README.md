@@ -20,6 +20,15 @@ Get to http://localhost:3000
 - Use 'Refresh' button to reload the collection from source
 - Use 'Add' to insert a new object into the collection
 - Double click a row to display the 'Update' and 'Delete' function
+- Use Export button to get the csv of the loaded collection
+- Use Import button to insert all the contents of the Exported csv
+
+You can also use the REST API programmatically through browser console, like:
+```
+poster('dbCal', {
+  method: 'get', dbName: 'yourDb', collName: 'yourCollection'
+}, res => console.log(res))
+```
 
 ## Dependencies
 ### Server Side
@@ -29,8 +38,8 @@ Get to http://localhost:3000
 ### Client Side
 - Lodash
 - Mithril
-- JQuery
 - Bulma CSS
+- Papa Parse
 
 ## Screenshots
 upcoming
