@@ -1,4 +1,6 @@
 var state = {},
+
+// Collection of helpers
 poster = (url, obj, cb) => fetch(url, {
   method: 'POST', body: JSON.stringify(obj)
 }).then(res => res.json()).then(cb),
@@ -19,11 +21,13 @@ makeModal = name => m('.modal',
 
 m.mount(document.body, {view: () => m('.container', m('.content',
   m('h1', 'Deno CRUD'),
+
+  // Top row buttons
   m('.buttons',
     m('.button.is-primary', {
       onclick: () => state.modalGetCollection = m('.box',
         m(autoForm({
-          id: 'getCollection',
+          id: 'getCollection', doc: state.target,
           schema: {
             dbName: {type: String, label: 'Database Name'},
             collName: {type: String, label: 'Collection Name'},
@@ -32,7 +36,6 @@ m.mount(document.body, {view: () => m('.container', m('.content',
               autoform: {placeholder: 'Ex: {"age": {"$gte": 20, "$lte": 35}}'}
             }
           },
-          doc: state.target,
           action: doc => [
             poster('dbCall', {
               method: 'get', ...doc
@@ -46,6 +49,8 @@ m.mount(document.body, {view: () => m('.container', m('.content',
         }))
       )
     }, 'Get Collection'),
+
+    // Buttons only shows when collection loaded
     state.collData && [
       m('.button.is-success', {
         onclick: () => [
@@ -102,6 +107,8 @@ m.mount(document.body, {view: () => m('.container', m('.content',
       }, 'Drop')
     ]
   ),
+
+  // Serach query bar
   state.collData && m('.control.is-expanded',
     m('input.input.is-fullwidth', {
       type: 'text', placeholder: 'Search by query, Ex: {"_id": "abc123"}',
@@ -119,6 +126,8 @@ m.mount(document.body, {view: () => m('.container', m('.content',
   makeModal('modalGetCollection'),
   makeModal('modalItem'),
   makeModal('modalAdd'),
+
+  // Collection table
   state.collData && m('table.table.is-striped',
     m('thead', m('tr', m('th', '#'), m('th', 'Document'))),
     m('tbody', (state.searchResults || state.collData || []).map((i, j) => m('tr',
