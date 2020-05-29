@@ -8,7 +8,9 @@ Create a file named `.env` inside the folder that contain this line:
 
 `MONGO="your mongo connection string"`
 
-Ex: I got my connection string from Atlas connect menu
+Ex: I got my connection string from Atlas connect menu.
+If you're using localhost then:
+`MONGO="mongodb://localhost:27017"`
 
 ## Start
 `deno run -A --unstable server.js`
@@ -39,6 +41,7 @@ poster('dbCall', {
 - Lodash
 - Mithril
 - Bulma CSS
+- SiftJS
 - Papa Parse
 
 ## Screenshots
