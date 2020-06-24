@@ -1,5 +1,5 @@
 var state = {},
-
+sanitize = string => string.replace(';', ''),
 // Collection of helpers
 poster = (url, obj, cb) => fetch(url, {
   method: 'POST', body: JSON.stringify(obj)
@@ -83,7 +83,7 @@ m.mount(document.body, {view: () => m('.container', m('.content',
       m('.button.is-link', {
         onclick: () => saveAs((
           new Blob([
-            [state.collData.map(i => JSON.stringify(i)+';').join('\n')]
+            [state.collData.map(i => sanitize(JSON.stringify(i))+';').join('\n')]
           ], {type: 'text/csv;charset=utf-8;'})
         ), state.target.dbName+'-'+state.target.collName+'-'+Date()+'.csv')
       }, 'Export'),
