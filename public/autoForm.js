@@ -14,23 +14,17 @@ function autoForm(opts){return {view: function(){
   function linearize(obj){
     function recurse(doc){
       var value = doc[_.keys(doc)[0]]
-      return typeof(value) === 'object' ?
-      _.map(value, function(val, key){
-        return recurse(_.fromPairs([[
-          _.keys(doc)[0]+'.'+key, val
-        ]]))
+      return typeof(value) === 'object' ? _.map(value, function(val, key){
+        return recurse({[_.keys(doc)[0]+'.'+key]: val})
       }) : doc
     }
     return _.fromPairs(
       _.flattenDeep(recurse({doc: obj}))
-      .map(function(i){return [
-        _.keys(i)[0].substr(4), _.values(i)[0]
-      ]})
+      .map(function(i){return [_.keys(i)[0].substr(4), _.values(i)[0]]})
     )
   }
 
-  afState.form[opts.id] = opts.doc ?
-    linearize(opts.doc) : afState.form[opts.id]
+  afState.form[opts.id] = opts.doc ? linearize(opts.doc) : afState.form[opts.id]
 
   var attr = {
     form: {
@@ -44,13 +38,12 @@ function autoForm(opts){return {view: function(){
         e.preventDefault()
         afState.form[opts.id] = opts.autoReset && null
         var submit = () => opts.action(
-          _.filter(e.target, function(i){
-            return i.name && i.value
-          }).map(function(obj){
+          _.filter(e.target, function(i){return i.name && i.value})
+          .map(function(obj){
             var type = opts.schema[normal(obj.name)].type
             return _.reduceRight(
               obj.name.split('.'),
-              function(res, inc){return _.fromPairs([[inc, res]])},
+              function(res, inc){return {[inc]: res}},
               obj.value && [ // value conversion
                 ((type === String) && obj.value),
                 ((type === Number) && +(obj.value)),
@@ -65,18 +58,13 @@ function autoForm(opts){return {view: function(){
                   return i === +_.keys(inc)[0] ?
                   recursive(_.values(inc)[0]) : undefined
                 }),
-                _.fromPairs([[
-                  _.keys(inc)[0],
-                  recursive(_.values(inc)[0])
-                ]])
-              ]),
-              inc
+                {[_.keys(inc)[0]]: recursive(_.values(inc)[0])}
+              ]), inc
             ])}
             return _.merge(res, recursive(inc))
           }, {})
         )
-        !opts.confirmMessage ? submit()
-        : confirm(opts.confirmMessage) && submit()
+        !opts.confirmMessage ? submit() : confirm(opts.confirmMessage) && submit()
       }
     },
     arrLen: function(name, type){return {onclick: function(){
@@ -121,6 +109,13 @@ function autoForm(opts){return {view: function(){
         rows: _.get(schema, 'autoform.rows') || 6,
       })
     )},
+    password: function(){return m('.field',
+      attr.label(name, schema), m('input.input', {
+        name: !schema.exclude ? name : '',
+        required: !schema.optional, type: 'password',
+        placeholder: _.get(schema, 'autoform.placeholder')
+      })
+    )},
     select: function(){return m('.field.is-expanded',
       attr.label(name, schema),
       m('.select.is-fullwidth', m('select',
@@ -160,9 +155,11 @@ function autoForm(opts){return {view: function(){
 
       schema.type === Array && m('.box',
         attr.label(name, schema),
-        m('.button.is-success', attr.arrLen(name, 'inc'), '+ Add'),
-        m('.button.is-warning', attr.arrLen(name, 'dec'), '- Rem'),
-        m('.button', afState.arrLen[name]),
+        m('tags',
+          m('tag.is-success', attr.arrLen(name, 'inc'), 'Add+'),
+          m('tag.is-warning', attr.arrLen(name, 'dec'), 'Rem-'),
+          m('tag', afState.arrLen[name]),
+        ),
         _.range(afState.arrLen[name]).map(function(i){
           var childSchema = opts.schema[normal(name)+'.$']
           return inputTypes(name+'.'+i, childSchema)
@@ -203,8 +200,9 @@ function autoForm(opts){return {view: function(){
         _.get(val, 'autoform.type') || 'standard'
       ]()
     }),
-    m('.row', m('input.button', _.merge({
-      type: 'submit', value: 'Submit', class: 'is-primary'
-    }, opts.submit)))
+    m('.row', m('button.button',
+      _.assign({type: 'submit', class: 'is-info'}, opts.submit),
+      (opts.submit && opts.submit.value) || 'Submit'
+    ))
   )
 }}}
